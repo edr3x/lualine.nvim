@@ -368,7 +368,7 @@ options = {
                                -- at bottom of neovim instead of one for  every window).
                                -- This feature is only available in neovim 0.7 and higher.
 
-  refresh = {                  -- sets how often lualine should refreash it's contents (in ms)
+  refresh = {                  -- sets how often lualine should refresh it's contents (in ms)
     statusline = 1000,         -- The refresh option sets minimum time that lualine tries
     tabline = 1000,            -- to maintain between refresh. It's not guarantied if situation
     winbar = 1000              -- arises that lualine needs to refresh itself before this time
@@ -452,9 +452,14 @@ sections = {
                    --   padding = { left = left_padding, right = right_padding }
 
       fmt = nil,   -- Format function, formats the component's output.
+                   -- This function receives two arguments:
+                   -- - string that is going to be displayed and
+                   --   that can be changed, enhanced and etc.
+                   -- - context object with information you might
+                   --   need. E.g. tabnr if used with tabs.
       on_click = nil, -- takes a function that is called when component is clicked with mouse.
                    -- the function receives several arguments
-                   -- - number of clicks incase of multiple clicks
+                   -- - number of clicks in case of multiple clicks
                    -- - mouse button used (l(left)/r(right)/m(middle)/...)
                    -- - modifiers pressed (s(shift)/c(ctrl)/a(alt)/m(meta)...)
     }
@@ -594,7 +599,7 @@ sections = {
     {
       'filename',
       file_status = true,      -- Displays file status (readonly status, modified status)
-      newfile_status = false   -- Display new file status (new file means no write after created)
+      newfile_status = false,  -- Display new file status (new file means no write after created)
       path = 0,                -- 0: Just the filename
                                -- 1: Relative path
                                -- 2: Absolute path
@@ -606,7 +611,7 @@ sections = {
         modified = '[+]',      -- Text to show when the file is modified.
         readonly = '[-]',      -- Text to show when the file is non-modifiable or readonly.
         unnamed = '[No Name]', -- Text to show for unnamed buffers.
-        newfile = '[New]',     -- Text to show for new created file before first writting
+        newfile = '[New]',     -- Text to show for newly created file before first write
       }
     }
   }
@@ -650,6 +655,16 @@ sections = {
         active = 'lualine_{section}_normal',     -- Color for active tab.
         inactive = 'lualine_{section}_inactive', -- Color for inactive tab.
       },
+
+      fmt = function(name, context)
+        -- Show + if buffer is modified in tab
+        local buflist = vim.fn.tabpagebuflist(context.tabnr)
+        local winnr = vim.fn.tabpagewinnr(context.tabnr)
+        local bufnr = buflist[winnr]
+        local mod = vim.fn.getbufvar(bufnr, '&mod')
+
+        return name .. (mod == 1 and ' +' or '')
+      end
     }
   }
 }
@@ -749,7 +764,7 @@ inactive_winbar = {
 ```
 Just like statusline you can separately specify winbar for active and inactive
 windows. Any lualine component can be placed in winbar. All kinds of custom
-components supported in statusline are also suported for winbar too. In general
+components supported in statusline are also supported for winbar too. In general
 You can treat winbar as another lualine statusline that just appears on top
 of windows instead of at bottom.
 
@@ -883,7 +898,7 @@ Note that you need to call this after the setup
 ```lua
   require('lualine').hide({
     place = {'statusline', 'tabline', 'winbar'}, -- The segment this change applies to.
-    unhide = false,  -- whether to reenable lualine again/
+    unhide = false,  -- whether to re-enable lualine again/
   })
 ```
 The arguments show for hide above are default values.
@@ -919,9 +934,3 @@ You can find some useful [configuration snippets](https://github.com/nvim-lualin
 
 If you want to extend lualine with plugins or want to know
 which ones already do, [wiki/plugins](https://github.com/nvim-lualine/lualine.nvim/wiki/Plugins) is for you.
-
-### Support
-
-If you appreciate my work you can buy me a coffee.
-
-<a href="https://www.buymeacoffee.com/shadmansalJ" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-black.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;"></a>
