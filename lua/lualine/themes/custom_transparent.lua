@@ -1,6 +1,6 @@
 local colors = {
     highlight = "#89DDFF",
-    bg        = "#1A1B26",
+    bg        = nil,
     fg        = "#B0BEC5",
     fg2       = '#3e445e',
     orange    = "#e78a4e",
